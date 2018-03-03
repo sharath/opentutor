@@ -3,12 +3,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/dustin/go-humanize"
-  packages = ["."]
-  revision = "bb3d318650d48840a39aa21a027c6630e198e626"
-
-[[projects]]
-  branch = "master"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
   revision = "22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae"
@@ -34,18 +28,6 @@
   packages = ["."]
   revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
   version = "v0.0.3"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/sharath/lambo"
-  packages = [
-    "binders",
-    "controllers",
-    "models/extern/CMC",
-    "models/intern",
-    "util"
-  ]
-  revision = "2aae7395145dfe11e08c0274f30d51e532a890ec"
 
 [[projects]]
   name = "github.com/ugorji/go"
@@ -95,6 +77,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b9774c2e6d4dd2e150aec932fcae85991f717ed79dceca1b67bb409ca115fe68"
+  inputs-digest = "69cf34a2182cfd69d656a402e9ce02b54c25d26e85d38d4eb40e0333690c876e"
   solver-name = "gps-cdcl"
   solver-version = 1

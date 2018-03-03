@@ -31,10 +31,6 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/sharath/lambo"
-
-[[constraint]]
-  branch = "master"
   name = "golang.org/x/crypto"
 
 [[constraint]]
