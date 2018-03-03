@@ -61,8 +61,12 @@ func VerifyAuthKey(user string, enc string, users *mgo.Collection) (bool, error)
 type User struct {
 	ID        string    `json:"id" bson:"id"`
 	Username  string    `json:"username" bson:"username"`
+	FirstName string    `json:"firstname" bson:"firstname"`
+	LastName  string    `json:"lastname" bson:"lastname"`
 	Password  string    `json:"password" bson:"password"`
-	AuthKeysD [5]string `json:"auth_key" json:"auth_key"`
+	Proposed  []string  `json:"proposed" bson:"proposed"`
+	Requested []string  `json:"requested" bson:"requested"`
+	AuthKeysD [5]string `json:"auth_key" bson:"auth_key"`
 }
 
 func (u *User) getAuthKey(users *mgo.Collection) (string, error) {

@@ -22,15 +22,16 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/", status)
+	router.GET("/api/user/tutor_requested", tutorRequested)
 	router.POST("/api/register", register)
 	router.POST("/api/login", login)
-	router.Run(":80")
+	router.Run(":8080")
 }
 
 func register(context *gin.Context) {
 	u := context.PostForm("username")
 	p := context.PostForm("password")
-	_, err  := intern.CreateUser(u, p, database.C("users"))
+	_, err := intern.CreateUser(u, p, database.C("users"))
 	if err != nil {
 		context.JSON(http.StatusBadRequest, resp.Error(err))
 		return
@@ -45,10 +46,23 @@ func status(context *gin.Context) {
 func login(context *gin.Context) {
 	u := context.PostForm("username")
 	p := context.PostForm("password")
-	AuthKey, err  := intern.AuthenticateUser(u, p, database.C("users"))
+	AuthKey, err := intern.AuthenticateUser(u, p, database.C("users"))
 	if err != nil {
 		context.JSON(http.StatusBadRequest, resp.Error(err))
 		return
 	}
-	context.JSON(200, resp.LoginResp(AuthKey))
+	context.JSON(200, resp.Login(AuthKey))
+}
+
+func tutorRequested(context *gin.Context) {
+	usr := context.GetString("username")
+	key := context.GetString("auth_key")
+	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
+	if err != nil {
+		context.JSON(http.StatusBadRequest, resp.Error(err))
+		return
+	}
+	if valid {
+
+	}
 }
