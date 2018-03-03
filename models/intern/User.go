@@ -2,7 +2,7 @@ package intern
 
 import (
 	"errors"
-	"github.com/sharath/tutoringApp/util"
+	"github.com/sharath/opentutor/util"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"strconv"
