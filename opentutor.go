@@ -59,13 +59,11 @@ func tutorRequested(context *gin.Context) {
 	usr := context.GetString("username")
 	key := context.GetString("auth_key")
 	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
-	if err != nil {
+	if err != nil || !valid {
 		context.JSON(http.StatusBadRequest, resp.Error(err))
 		return
 	}
-	if valid {
-
-	}
+	context.JSON(http.StatusOK, resp.Proposal(usr, database.C("users")))
 }
 
 func major(context *gin.Context) {
