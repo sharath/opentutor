@@ -6,8 +6,8 @@ import (
 	"gopkg.in/mgo.v2"
 	"fmt"
 	"os"
-	"github.com/sharath/tutoringApp/models/intern"
-	"github.com/sharath/tutoringApp/models/resp"
+	"github.com/sharath/opentutor/models/intern"
+	"github.com/sharath/opentutor/models/resp"
 )
 
 var database *mgo.Database
