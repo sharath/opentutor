@@ -8,7 +8,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func Proposal(user *intern.User, users mgo.Collection) gin.H {
+func Proposal(usr string, users mgo.Collection) gin.H {
+	var user intern.User
+	users.Find(bson.M{"username":usr}).One(&user)
 	type MinInfo struct {
 		FirstName string `json:"firstname" bson:"firstname"`
 		LastName  string `json:"lastname" bson:"lastname"`
