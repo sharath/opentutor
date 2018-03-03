@@ -22,9 +22,9 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/", status)
-	router.GET("/api/register", register)
-	router.GET("/api/login", login)
-	router.Run(":8080")
+	router.POST("/api/register", register)
+	router.POST("/api/login", login)
+	router.Run(":80")
 }
 
 func register(context *gin.Context) {
