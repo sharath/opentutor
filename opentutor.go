@@ -23,11 +23,12 @@ func main() {
 	router := gin.Default()
 	router.GET("/", status)
 	router.GET("/api/register", register)
+	router.GET("/api/login", login)
 	router.Run(":8080")
 }
 
 func register(context *gin.Context) {
-	u := context.PostForm("email")
+	u := context.PostForm("username")
 	p := context.PostForm("password")
 	_, err  := intern.CreateUser(u, p, database.C("users"))
 	if err != nil {
@@ -39,4 +40,15 @@ func register(context *gin.Context) {
 
 func status(context *gin.Context) {
 	context.JSON(http.StatusOK, resp.OK())
+}
+
+func login(context *gin.Context) {
+	u := context.PostForm("username")
+	p := context.PostForm("password")
+	AuthKey, err  := intern.AuthenticateUser(u, p, database.C("users"))
+	if err != nil {
+		context.JSON(http.StatusBadRequest, resp.Error(err))
+		return
+	}
+	context.JSON(200, resp.LoginResp(AuthKey))
 }

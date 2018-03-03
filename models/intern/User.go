@@ -28,14 +28,14 @@ func CreateUser(username string, password string, users *mgo.Collection) (*User,
 }
 
 // AuthenticateUser checks a username/password to see if it's valid
-func AuthenticateUser(username string, password string, users *mgo.Collection) (string, string, error) {
+func AuthenticateUser(username string, password string, users *mgo.Collection) (string, error) {
 	var user User
 	users.Find(bson.M{"username": username}).One(&user)
 	if util.CompareHash(user.Password, password) {
 		authKey, err := user.getAuthKey(users)
-		return user.ID, authKey, err
+		return authKey, err
 	}
-	return "", "", errors.New("invalid login")
+	return "", errors.New("invalid login")
 }
 
 // VerifyAuthKey returns whether a username authkey pair is valid
@@ -43,7 +43,7 @@ func VerifyAuthKey(user string, enc string, users *mgo.Collection) (bool, error)
 	var u User
 	var match bool
 
-	err := users.Find(bson.M{"id": user}).One(&u)
+	err := users.Find(bson.M{"username": user}).One(&u)
 	if err != nil {
 		return match, errors.New("invalid user")
 	}
