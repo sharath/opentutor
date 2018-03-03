@@ -37,6 +37,15 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/crypto"
+  packages = [
+    "bcrypt",
+    "blowfish"
+  ]
+  revision = "91a49db82a88618983a78a06c1cbd4e00ab749ab"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
   revision = "dd2ff4accc098aceecb86b36eaa7829b2a17b1c9"
@@ -48,6 +57,18 @@
   version = "v8.18.2"
 
 [[projects]]
+  branch = "v2"
+  name = "gopkg.in/mgo.v2"
+  packages = [
+    ".",
+    "bson",
+    "internal/json",
+    "internal/sasl",
+    "internal/scram"
+  ]
+  revision = "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+
+[[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
@@ -56,6 +77,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1a2b10f3ec80fa4b6ad88156b737403ca45820640ec668e0b797538b6274d305"
+  inputs-digest = "69cf34a2182cfd69d656a402e9ce02b54c25d26e85d38d4eb40e0333690c876e"
   solver-name = "gps-cdcl"
   solver-version = 1
