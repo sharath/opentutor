@@ -56,16 +56,17 @@ func VerifyAuthKey(username string, key string, users *mgo.Collection) bool {
 
 // User represents the MongoDB model for login/authentication
 type User struct {
-	ID          string    `json:"id" bson:"id"`
-	Username    string    `json:"username" bson:"username"`
-	FirstName   string    `json:"firstname" bson:"firstname"`
-	LastName    string    `json:"lastname" bson:"lastname"`
-	Password    string    `json:"password" bson:"password"`
-	Description string    `json:"description" bson:"description"`
-	Proposed    []string  `json:"proposed" bson:"proposed"`
-	Requested   []string  `json:"requested" bson:"requested"`
-	Reviews     []string  `json:"reviews" bson:"reviews"`
-	AuthKeysD   [5]string `json:"auth_key" bson:"auth_key"`
+	ID          string              `json:"id" bson:"id"`
+	Username    string              `json:"username" bson:"username"`
+	FirstName   string              `json:"firstname" bson:"firstname"`
+	LastName    string              `json:"lastname" bson:"lastname"`
+	Password    string              `json:"password" bson:"password"`
+	Description string              `json:"description" bson:"description"`
+	Proposed    []string            `json:"proposed" bson:"proposed"`
+	Requested   []string            `json:"requested" bson:"requested"`
+	Reviews     []string            `json:"reviews" bson:"reviews"`
+	AuthKeysD   [5]string           `json:"auth_key" bson:"auth_key"`
+	Classes     map[string][]string `json:"classes" bson:"classes"`
 }
 
 func (u *User) getAuthKey(users *mgo.Collection) string {
@@ -74,6 +75,7 @@ func (u *User) getAuthKey(users *mgo.Collection) string {
 
 func GetUser(username string, users *mgo.Collection) (*User, error) {
 	user := new(User)
+	user.Classes = make(map[string][]string)
 	err := users.Find(bson.M{"username": username}).One(&user)
 	return user, err
 }
