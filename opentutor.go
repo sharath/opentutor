@@ -24,6 +24,7 @@ func main() {
 	router.GET("/", status)
 	router.GET("/api/user/proposed", tutorProposed)
 	router.GET("/api/user/requested", tutorRequested)
+	router.GET("/api/tutor", findTutor)
 	router.GET("/api/classes", major)
 	router.POST("/api/register", register)
 	router.POST("/api/login", login)
@@ -89,4 +90,17 @@ func major(context *gin.Context) {
 		return
 	}
 	context.JSON(http.StatusOK, resp.Major(database.C("classes")))
+}
+
+func findTutor(context *gin.Context) {
+	usr := context.GetString("username")
+	key := context.GetString("password")
+	subject := context.GetString("subject")
+	number := context.GetString("class")
+	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
+	if err != nil || !valid {
+		context.JSON(http.StatusBadRequest, resp.Error(err))
+		return
+	}
+	context.JSON(http.StatusOK, resp.FindTutorResp(subject, number, database.C("users")))
 }
