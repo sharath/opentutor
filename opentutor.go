@@ -83,7 +83,7 @@ func tutorRequested(context *gin.Context) {
 
 func major(context *gin.Context) {
 	usr := context.GetString("username")
-	key := context.GetString("password")
+	key := context.GetString("auth_key")
 	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
 	if err != nil || !valid {
 		context.JSON(http.StatusBadRequest, resp.Error(err))
@@ -94,7 +94,7 @@ func major(context *gin.Context) {
 
 func findTutor(context *gin.Context) {
 	usr := context.GetString("username")
-	key := context.GetString("password")
+	key := context.GetString("auth_key")
 	subject := context.GetString("subject")
 	number := context.GetString("class")
 	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
