@@ -22,7 +22,8 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/", status)
-	router.GET("/api/user/tutor_requested", tutorRequested)
+	router.GET("/api/user/proposed", tutorProposed)
+	router.GET("/api/user/requested", tutorRequested)
 	router.GET("/api/classes", major)
 	router.POST("/api/register", register)
 	router.POST("/api/login", login)
@@ -55,7 +56,7 @@ func login(context *gin.Context) {
 	context.JSON(200, resp.Login(AuthKey))
 }
 
-func tutorRequested(context *gin.Context) {
+func tutorProposed(context *gin.Context) {
 	usr := context.GetString("username")
 	key := context.GetString("auth_key")
 	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
@@ -64,6 +65,17 @@ func tutorRequested(context *gin.Context) {
 		return
 	}
 	context.JSON(http.StatusOK, resp.Proposal(usr, database.C("users")))
+}
+
+func tutorRequested(context *gin.Context) {
+	usr := context.GetString("username")
+	key := context.GetString("auth_key")
+	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
+	if err != nil || !valid {
+		context.JSON(http.StatusBadRequest, resp.Error(err))
+		return
+	}
+	context.JSON(http.StatusOK, resp.Requested(usr, database.C("users")))
 }
 
 func major(context *gin.Context) {
