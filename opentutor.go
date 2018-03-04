@@ -20,7 +20,7 @@ func main() {
 		os.Exit(-1)
 	}
 	database = session.DB("ot")
-
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	router.GET("/", status)
 	router.GET("/api/user/proposed", tutorProposed)

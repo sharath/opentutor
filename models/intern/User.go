@@ -3,7 +3,6 @@ package intern
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"strconv"
@@ -20,7 +19,6 @@ func CreateUser(username string, password string, firstname string, lastname str
 	u.ID = generateUserID(users)
 	u.Username = username
 	u.Password = password
-	fmt.Println(password)
 	u.FirstName = firstname
 	u.LastName = lastname
 	if password == "" {
@@ -32,45 +30,56 @@ func CreateUser(username string, password string, firstname string, lastname str
 
 // AuthenticateUser checks a username/password to see if it's valid
 func AuthenticateUser(username string, password string, users *mgo.Collection) string {
-	var user User
-	users.Find(bson.M{"username": username}).One(&user)
+	user, err := GetUser(username, users)
+	if err != nil {
+		return ""
+	}
 	if password == user.Password {
 		authKey := user.getAuthKey(users)
 		return authKey
 	}
-	fmt.Println(user.Password, password)
 	return ""
 }
 
 // VerifyAuthKey returns whether a username authkey pair is valid
-func VerifyAuthKey(user string, key string, users *mgo.Collection) bool {
-	var u User
-	err := users.Find(bson.M{"username": user}).One(&u)
+func VerifyAuthKey(username string, key string, users *mgo.Collection) bool {
+	user, err := GetUser(username, users)
 	if err != nil {
 		return false
 	}
-	compare := base64.StdEncoding.EncodeToString([]byte(u.Password))
+	compare := base64.StdEncoding.EncodeToString([]byte(user.Password))
 	if compare == key {
 		return true
 	}
-	fmt.Println(compare, key)
 	return false
 }
 
 // User represents the MongoDB model for login/authentication
 type User struct {
-	ID        string    `json:"id" bson:"id"`
-	Username  string    `json:"username" bson:"username"`
-	FirstName string    `json:"firstname" bson:"firstname"`
-	LastName  string    `json:"lastname" bson:"lastname"`
-	Password  string    `json:"password" bson:"password"`
-	Proposed  []string  `json:"proposed" bson:"proposed"`
-	Requested []string  `json:"requested" bson:"requested"`
-	AuthKeysD [5]string `json:"auth_key" bson:"auth_key"`
+	ID          string    `json:"id" bson:"id"`
+	Username    string    `json:"username" bson:"username"`
+	FirstName   string    `json:"firstname" bson:"firstname"`
+	LastName    string    `json:"lastname" bson:"lastname"`
+	Password    string    `json:"password" bson:"password"`
+	Description string    `json:"description" bson:"description"`
+	Proposed    []string  `json:"proposed" bson:"proposed"`
+	Requested   []string  `json:"requested" bson:"requested"`
+	Reviews     []string  `json:"reviews" bson:"reviews"`
+	AuthKeysD   [5]string `json:"auth_key" bson:"auth_key"`
 }
 
 func (u *User) getAuthKey(users *mgo.Collection) string {
 	return base64.StdEncoding.EncodeToString([]byte(u.Password))
+}
+
+func GetUser(username string, users *mgo.Collection) (*User, error) {
+	user := new(User)
+	err := users.Find(bson.M{"username": username}).One(&user)
+	return user, err
+}
+
+func UpdateUser(user User, users *mgo.Collection) {
+	users.Update(bson.M{"id": user.ID}, user)
 }
 
 func generateUserID(users *mgo.Collection) string {
