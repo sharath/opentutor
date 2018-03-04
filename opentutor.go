@@ -33,7 +33,9 @@ func main() {
 func register(context *gin.Context) {
 	u := context.PostForm("username")
 	p := context.PostForm("password")
-	_, err := intern.CreateUser(u, p, database.C("users"))
+	fn := context.PostForm("firstname")
+	ln := context.PostForm("lastname")
+	_, err := intern.CreateUser(u, p, fn, ln, database.C("users"))
 	if err != nil {
 		context.JSON(http.StatusBadRequest, resp.Error(err))
 		return

@@ -9,7 +9,7 @@ import (
 )
 
 // CreateUser makes a new user from a username and password and adds it to MongoDB
-func CreateUser(username string, password string, users *mgo.Collection) (*User, error) {
+func CreateUser(username string, password string, firstname string, lastname string, users *mgo.Collection) (*User, error) {
 	u := new(User)
 	if !validNewUsername(users, username) {
 		return u, errors.New("invalid username")
@@ -20,6 +20,8 @@ func CreateUser(username string, password string, users *mgo.Collection) (*User,
 	u.ID = generateUserID(users)
 	u.Username = username
 	u.Password = util.Hash(password)
+	u.FirstName = firstname
+	u.LastName = lastname
 	if password == "" {
 		return u, errors.New("invalid password")
 	}
