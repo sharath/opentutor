@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http"
-	"gopkg.in/mgo.v2"
+	"errors"
 	"fmt"
-	"os"
+	"github.com/gin-gonic/gin"
 	"github.com/sharath/opentutor/models/intern"
 	"github.com/sharath/opentutor/models/resp"
-	"errors"
+	"gopkg.in/mgo.v2"
+	"net/http"
+	"os"
 )
 
 var database *mgo.Database
@@ -63,7 +63,7 @@ func login(context *gin.Context) {
 func tutorProposed(context *gin.Context) {
 	usr := context.Query("username")
 	key := context.Query("auth_key")
-	valid  := intern.VerifyAuthKey(usr, key, database.C("users"))
+	valid := intern.VerifyAuthKey(usr, key, database.C("users"))
 	if !valid {
 		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
 		return
@@ -74,9 +74,9 @@ func tutorProposed(context *gin.Context) {
 func tutorRequested(context *gin.Context) {
 	usr := context.Query("username")
 	key := context.Query("auth_key")
-	valid  := intern.VerifyAuthKey(usr, key, database.C("users"))
+	valid := intern.VerifyAuthKey(usr, key, database.C("users"))
 	if !valid {
-		fmt.Println(usr,key)
+		fmt.Println(usr, key)
 		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
 		return
 	}
@@ -86,9 +86,9 @@ func tutorRequested(context *gin.Context) {
 func major(context *gin.Context) {
 	usr := context.Query("username")
 	key := context.Query("auth_key")
-	valid  := intern.VerifyAuthKey(usr, key, database.C("users"))
+	valid := intern.VerifyAuthKey(usr, key, database.C("users"))
 	if !valid {
-		fmt.Println(usr,key)
+		fmt.Println(usr, key)
 		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
 		return
 	}

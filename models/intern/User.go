@@ -1,12 +1,12 @@
 package intern
 
 import (
+	"encoding/base64"
 	"errors"
+	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"strconv"
-	"encoding/base64"
-	"fmt"
 )
 
 func CreateUser(username string, password string, firstname string, lastname string, users *mgo.Collection) (*User, error) {
@@ -31,7 +31,7 @@ func CreateUser(username string, password string, firstname string, lastname str
 }
 
 // AuthenticateUser checks a username/password to see if it's valid
-func AuthenticateUser(username string, password string, users *mgo.Collection) (string) {
+func AuthenticateUser(username string, password string, users *mgo.Collection) string {
 	var user User
 	users.Find(bson.M{"username": username}).One(&user)
 	if password == user.Password {
@@ -69,7 +69,7 @@ type User struct {
 	AuthKeysD [5]string `json:"auth_key" bson:"auth_key"`
 }
 
-func (u *User) getAuthKey(users *mgo.Collection) (string) {
+func (u *User) getAuthKey(users *mgo.Collection) string {
 	return base64.StdEncoding.EncodeToString([]byte(u.Password))
 }
 

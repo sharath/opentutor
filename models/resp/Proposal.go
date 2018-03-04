@@ -1,16 +1,16 @@
 package resp
 
 import (
+	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"github.com/sharath/opentutor/models/intern"
 	"gopkg.in/mgo.v2"
-	"github.com/gin-gonic/gin"
-	"encoding/json"
 	"gopkg.in/mgo.v2/bson"
 )
 
 func Proposal(usr string, users *mgo.Collection) gin.H {
 	var user intern.User
-	users.Find(bson.M{"username":usr}).One(&user)
+	users.Find(bson.M{"username": usr}).One(&user)
 	type MinInfo struct {
 		FirstName string `json:"firstname" bson:"firstname"`
 		LastName  string `json:"lastname" bson:"lastname"`
