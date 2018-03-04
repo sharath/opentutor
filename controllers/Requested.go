@@ -1,4 +1,4 @@
-package resp
+package controllers
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func Proposal(usr string, users *mgo.Collection) gin.H {
+func Requested(usr string, users *mgo.Collection) gin.H {
 	var user intern.User
 	users.Find(bson.M{"username": usr}).One(&user)
 	type MinInfo struct {
@@ -16,7 +16,7 @@ func Proposal(usr string, users *mgo.Collection) gin.H {
 		LastName  string `json:"lastname" bson:"lastname"`
 	}
 	t := make(map[string]MinInfo)
-	for _, id := range user.Proposed {
+	for _, id := range user.Requested {
 		var sqry intern.User
 		users.Find(bson.M{"id": id}).All(&sqry)
 		var min MinInfo
@@ -25,6 +25,6 @@ func Proposal(usr string, users *mgo.Collection) gin.H {
 		t[sqry.Username] = min
 	}
 	return gin.H{
-		"proposed": t,
+		"requested": t,
 	}
 }

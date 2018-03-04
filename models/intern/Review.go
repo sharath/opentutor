@@ -2,8 +2,8 @@ package intern
 
 import (
 	"gopkg.in/mgo.v2"
-	"strconv"
 	"gopkg.in/mgo.v2/bson"
+	"strconv"
 )
 
 type Review struct {

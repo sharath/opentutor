@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/sharath/opentutor/controllers"
 	"github.com/sharath/opentutor/models/intern"
-	"github.com/sharath/opentutor/models/resp"
 	"gopkg.in/mgo.v2"
 	"net/http"
 	"os"
@@ -23,8 +23,9 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	router.GET("/", status)
-	router.GET("/api/user/proposed", tutorProposed)
-	router.GET("/api/user/requested", tutorRequested)
+	router.GET("/api/user/proposed", userProposed)
+	router.GET("/api/user/requested", userRequested)
+	router.GET("/api/user/reviews", userReviews)
 	router.GET("/api/tutor", findTutor)
 	router.GET("/api/classes", major)
 	router.POST("/api/register", register)
@@ -39,14 +40,14 @@ func register(context *gin.Context) {
 	ln := context.PostForm("lastname")
 	_, err := intern.CreateUser(u, p, fn, ln, database.C("users"))
 	if err != nil {
-		context.JSON(http.StatusBadRequest, resp.Error(err))
+		context.JSON(http.StatusBadRequest, controllers.Error(err))
 		return
 	}
-	context.JSON(http.StatusOK, resp.OK())
+	context.JSON(http.StatusOK, controllers.OK())
 }
 
 func status(context *gin.Context) {
-	context.JSON(http.StatusOK, resp.OK())
+	context.JSON(http.StatusOK, controllers.OK())
 }
 
 func login(context *gin.Context) {
@@ -54,33 +55,45 @@ func login(context *gin.Context) {
 	p := context.PostForm("password")
 	authkey := intern.AuthenticateUser(u, p, database.C("users"))
 	if authkey != "" {
-		context.JSON(200, resp.Login(authkey))
+		context.JSON(200, controllers.Login(authkey))
 		return
 	}
-	context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
+	context.JSON(http.StatusBadRequest, controllers.Error(errors.New("invalid login")))
 }
 
-func tutorProposed(context *gin.Context) {
+func userProposed(context *gin.Context) {
 	usr := context.Query("username")
 	key := context.Query("auth_key")
 	valid := intern.VerifyAuthKey(usr, key, database.C("users"))
 	if !valid {
-		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
+		context.JSON(http.StatusBadRequest, controllers.Error(errors.New("invalid login")))
 		return
 	}
-	context.JSON(http.StatusOK, resp.Proposal(usr, database.C("users")))
+	context.JSON(http.StatusOK, controllers.Proposal(usr, database.C("users")))
 }
 
-func tutorRequested(context *gin.Context) {
+func userRequested(context *gin.Context) {
 	usr := context.Query("username")
 	key := context.Query("auth_key")
 	valid := intern.VerifyAuthKey(usr, key, database.C("users"))
 	if !valid {
 		fmt.Println(usr, key)
-		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
+		context.JSON(http.StatusBadRequest, controllers.Error(errors.New("invalid login")))
 		return
 	}
-	context.JSON(http.StatusOK, resp.Requested(usr, database.C("users")))
+	context.JSON(http.StatusOK, controllers.Requested(usr, database.C("users")))
+}
+
+func userReviews(context *gin.Context) {
+	usr := context.Query("username")
+	key := context.Query("auth_key")
+	valid := intern.VerifyAuthKey(usr, key, database.C("users"))
+	if !valid {
+		fmt.Println(usr, key)
+		context.JSON(http.StatusBadRequest, controllers.Error(errors.New("invalid login")))
+		return
+	}
+	context.JSON(http.StatusOK, controllers.Reviews(usr, database.C("users"), database.C("reviews")))
 }
 
 func major(context *gin.Context) {
@@ -89,10 +102,10 @@ func major(context *gin.Context) {
 	valid := intern.VerifyAuthKey(usr, key, database.C("users"))
 	if !valid {
 		fmt.Println(usr, key)
-		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
+		context.JSON(http.StatusBadRequest, controllers.Error(errors.New("invalid login")))
 		return
 	}
-	context.JSON(http.StatusOK, resp.Major(database.C("classes")))
+	context.JSON(http.StatusOK, controllers.Major(database.C("classes")))
 }
 
 func findTutor(context *gin.Context) {
@@ -102,8 +115,8 @@ func findTutor(context *gin.Context) {
 	number := context.Query("class")
 	valid := intern.VerifyAuthKey(usr, key, database.C("users"))
 	if !valid {
-		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
+		context.JSON(http.StatusBadRequest, controllers.Error(errors.New("invalid login")))
 		return
 	}
-	context.JSON(http.StatusOK, resp.FindTutorResp(subject, number, database.C("users")))
+	context.JSON(http.StatusOK, controllers.FindTutorResp(subject, number, database.C("users")))
 }

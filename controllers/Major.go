@@ -1,4 +1,4 @@
-package resp
+package controllers
 
 import (
 	"gopkg.in/mgo.v2"
