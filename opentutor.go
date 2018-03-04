@@ -29,7 +29,7 @@ func main() {
 	router.GET("/api/classes", major)
 	router.POST("/api/register", register)
 	router.POST("/api/login", login)
-	router.Run(":8080")
+	router.Run(":80")
 }
 
 func register(context *gin.Context) {
