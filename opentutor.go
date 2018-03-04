@@ -8,6 +8,7 @@ import (
 	"os"
 	"github.com/sharath/opentutor/models/intern"
 	"github.com/sharath/opentutor/models/resp"
+	"errors"
 )
 
 var database *mgo.Database
@@ -51,55 +52,57 @@ func status(context *gin.Context) {
 func login(context *gin.Context) {
 	u := context.PostForm("username")
 	p := context.PostForm("password")
-	AuthKey, err := intern.AuthenticateUser(u, p, database.C("users"))
-	if err != nil {
-		context.JSON(http.StatusBadRequest, resp.Error(err))
+	authkey := intern.AuthenticateUser(u, p, database.C("users"))
+	if authkey != "" {
+		context.JSON(200, resp.Login(authkey))
 		return
 	}
-	context.JSON(200, resp.Login(AuthKey))
+	context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
 }
 
 func tutorProposed(context *gin.Context) {
-	usr := context.GetString("username")
-	key := context.GetString("auth_key")
-	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
-	if err != nil || !valid {
-		context.JSON(http.StatusBadRequest, resp.Error(err))
+	usr := context.Query("username")
+	key := context.Query("auth_key")
+	valid  := intern.VerifyAuthKey(usr, key, database.C("users"))
+	if !valid {
+		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
 		return
 	}
 	context.JSON(http.StatusOK, resp.Proposal(usr, database.C("users")))
 }
 
 func tutorRequested(context *gin.Context) {
-	usr := context.GetString("username")
-	key := context.GetString("auth_key")
-	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
-	if err != nil || !valid {
-		context.JSON(http.StatusBadRequest, resp.Error(err))
+	usr := context.Query("username")
+	key := context.Query("auth_key")
+	valid  := intern.VerifyAuthKey(usr, key, database.C("users"))
+	if !valid {
+		fmt.Println(usr,key)
+		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
 		return
 	}
 	context.JSON(http.StatusOK, resp.Requested(usr, database.C("users")))
 }
 
 func major(context *gin.Context) {
-	usr := context.GetString("username")
-	key := context.GetString("password")
-	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
-	if err != nil || !valid {
-		context.JSON(http.StatusBadRequest, resp.Error(err))
+	usr := context.Query("username")
+	key := context.Query("auth_key")
+	valid  := intern.VerifyAuthKey(usr, key, database.C("users"))
+	if !valid {
+		fmt.Println(usr,key)
+		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
 		return
 	}
 	context.JSON(http.StatusOK, resp.Major(database.C("classes")))
 }
 
 func findTutor(context *gin.Context) {
-	usr := context.GetString("username")
-	key := context.GetString("password")
-	subject := context.GetString("subject")
-	number := context.GetString("class")
-	valid, err := intern.VerifyAuthKey(usr, key, database.C("users"))
-	if err != nil || !valid {
-		context.JSON(http.StatusBadRequest, resp.Error(err))
+	usr := context.Query("username")
+	key := context.Query("auth_key")
+	subject := context.Query("subject")
+	number := context.Query("class")
+	valid := intern.VerifyAuthKey(usr, key, database.C("users"))
+	if !valid {
+		context.JSON(http.StatusBadRequest, resp.Error(errors.New("invalid login")))
 		return
 	}
 	context.JSON(http.StatusOK, resp.FindTutorResp(subject, number, database.C("users")))

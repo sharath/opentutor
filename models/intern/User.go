@@ -2,13 +2,13 @@ package intern
 
 import (
 	"errors"
-	"github.com/sharath/opentutor/util"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"strconv"
+	"encoding/base64"
+	"fmt"
 )
 
-// CreateUser makes a new user from a username and password and adds it to MongoDB
 func CreateUser(username string, password string, firstname string, lastname string, users *mgo.Collection) (*User, error) {
 	u := new(User)
 	if !validNewUsername(users, username) {
@@ -19,7 +19,8 @@ func CreateUser(username string, password string, firstname string, lastname str
 	}
 	u.ID = generateUserID(users)
 	u.Username = username
-	u.Password = util.Hash(password)
+	u.Password = password
+	fmt.Println(password)
 	u.FirstName = firstname
 	u.LastName = lastname
 	if password == "" {
@@ -30,33 +31,30 @@ func CreateUser(username string, password string, firstname string, lastname str
 }
 
 // AuthenticateUser checks a username/password to see if it's valid
-func AuthenticateUser(username string, password string, users *mgo.Collection) (string, error) {
+func AuthenticateUser(username string, password string, users *mgo.Collection) (string) {
 	var user User
 	users.Find(bson.M{"username": username}).One(&user)
-	if util.CompareHash(user.Password, password) {
-		authKey, err := user.getAuthKey(users)
-		return authKey, err
+	if password == user.Password {
+		authKey := user.getAuthKey(users)
+		return authKey
 	}
-	return "", errors.New("invalid login")
+	fmt.Println(user.Password, password)
+	return ""
 }
 
 // VerifyAuthKey returns whether a username authkey pair is valid
-func VerifyAuthKey(user string, enc string, users *mgo.Collection) (bool, error) {
+func VerifyAuthKey(user string, key string, users *mgo.Collection) bool {
 	var u User
-	var match bool
-
 	err := users.Find(bson.M{"username": user}).One(&u)
 	if err != nil {
-		return match, errors.New("invalid user")
+		return false
 	}
-	for _, key := range u.AuthKeysD {
-		k, _ := util.CookieCoding.DecodeString(key)
-		decrypt, _ := util.Decrypt(enc, k)
-		if decrypt == u.Username {
-			match = true
-		}
+	compare := base64.StdEncoding.EncodeToString([]byte(u.Password))
+	if compare == key {
+		return true
 	}
-	return match, err
+	fmt.Println(compare, key)
+	return false
 }
 
 // User represents the MongoDB model for login/authentication
@@ -71,25 +69,8 @@ type User struct {
 	AuthKeysD [5]string `json:"auth_key" bson:"auth_key"`
 }
 
-func (u *User) getAuthKey(users *mgo.Collection) (string, error) {
-	var err error
-	payload := u.Username
-	key, err := util.NewEncryptionKey()
-	if err != nil {
-		return "", err
-	}
-	enc, err := util.Encrypt(payload, key)
-	if err != nil {
-		return "", err
-	}
-	for i := len(u.AuthKeysD) - 1; i > 0; i-- {
-		u.AuthKeysD[i] = u.AuthKeysD[i-1]
-	}
-	u.AuthKeysD[0] = util.CookieCoding.EncodeToString(key)
-	users.Update(bson.M{
-		"id": u.ID,
-	}, u)
-	return enc, err
+func (u *User) getAuthKey(users *mgo.Collection) (string) {
+	return base64.StdEncoding.EncodeToString([]byte(u.Password))
 }
 
 func generateUserID(users *mgo.Collection) string {
